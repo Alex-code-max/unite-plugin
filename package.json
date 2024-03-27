@@ -3,6 +3,10 @@
   "displayName": "unit-plugin",
   "description": "天元项目插件",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alex-code-max/unite-plugin"
+  },
   "engines": {
     "vscode": "^1.87.0"
   },
