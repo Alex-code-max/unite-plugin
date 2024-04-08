@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
-import { getGitBranch } from "../utils/common";
+import { OpenBrowser, getGitBranch } from "../utils/common";
 import { TaskIdReg, UnitProjectUrl } from "../utils/consts";
-import { Platform } from "../utils/enum";
-import { exec } from "child_process";
-import * as os from "os";
 
 export const openTheCurrentTaskInUnite = () =>
   vscode.commands.registerCommand(
@@ -14,17 +11,13 @@ export const openTheCurrentTaskInUnite = () =>
         return;
       }
       // const terminal = vscode.window.activeTerminal;
+      // terminal?.sendText(taskId);
       const taskId = branch.replace(TaskIdReg, "");
 
-      // terminal?.sendText(taskId);
       if (!+taskId) {
         vscode.window.showInformationMessage("当前分支不包含任务号");
         return;
       }
-      if (os.platform() === Platform["WindowOS"]) {
-        exec(`start ${UnitProjectUrl}${taskId}`);
-      } else {
-        exec(`open ${UnitProjectUrl}${taskId}`);
-      }
+      OpenBrowser(`${UnitProjectUrl}${taskId}`);
     }
   );
