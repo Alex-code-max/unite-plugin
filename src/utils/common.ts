@@ -1,4 +1,3 @@
-import { openLoginWebView } from "./../command/open-login-web-view";
 import * as vscode from "vscode";
 import { AddStatusBtn } from "../status-bar/add-status-btn";
 import axios from "axios";
@@ -29,14 +28,40 @@ export const getGitBranch = async () => {
   }
 };
 
-export const handleGetTaskName = async (taskId: string) => {
+export const OpenBrowser = (url: string) => {
+  if (os.platform() === Platform["WindowOS"]) {
+    exec(`start ${url}`);
+  } else {
+    exec(`open ${url}`);
+  }
+};
+
+export const GetStorageData = async (context: vscode.ExtensionContext) => {
+  const secrets = context["secrets"]; //SecretStorage-object
+  const mySecret = await secrets.get("token"); //Get a secret
+  return mySecret;
+};
+
+export const handleLogined = async (
+  context: vscode.ExtensionContext,
+  token: string
+) => {
+  const secrets = context["secrets"]; //SecretStorage-object
+  await secrets.store("token", token); //Save a secret
+  vscode.commands.executeCommand("extension.getUniteTaskName");
+};
+
+export const handleGetTaskName = async (
+  taskId: string,
+  context: vscode.ExtensionContext
+) => {
+  const token = GetStorageData(context);
   axios({
     method: "POST",
     url: "https://unite.qa.tcshuke.com/api/project/getIssueByField",
     //   withCredentials: true,
     headers: {
-      Cookie:
-        "__AUTHZ_SSO_TICKET__=e2e69178dbc714db8376ea1018c3809d; JSESSIONID=L-Yp4PaaKXpHuPyk9_VEifZnkPE4aAoQkCE8D07l",
+      Cookie: `__AUTHZ_SSO_TICKET__=${token}`,
       Requestid: "1711615289743-66ee2c7b-388b-a087-83fc-fdb7319fa918",
       "content-type": "application/json;charset=UTF-8",
     },
@@ -48,8 +73,9 @@ export const handleGetTaskName = async (taskId: string) => {
     .then((response: any) => {
       if (response.data.statusCode === 401) {
         vscode.window.showInformationMessage("登录过期，请重新登录");
-        //TODO: 重新登录逻辑
-        // vscode.commands.executeCommand("extension.openLoginWebView");
+        OpenBrowser(
+          "https://tccommon.17usoft.com/oauth/authorize?response_type=code&scope=read&client_id=JF_AUTHZ_CLIENT&redirect_uri=https://authzsso.tcshuke.com/oa/authorizationCallback&state=eac685ce9bcd4bce865b90fdde37dd2e&return_uri=https://alex-code-max.github.io/alexyu_blog/unite-login"
+        );
         return;
       }
       if (response.data.code !== "0000") {
@@ -68,12 +94,4 @@ export const handleGetTaskName = async (taskId: string) => {
     .catch((error: any) => {
       vscode.window.showInformationMessage(`Error: ${error.message}`);
     });
-};
-
-export const OpenBrowser = (url: string) => {
-  if (os.platform() === Platform["WindowOS"]) {
-    exec(`start ${url}`);
-  } else {
-    exec(`open ${url}`);
-  }
 };

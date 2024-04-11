@@ -10,8 +10,6 @@ export const openTheCurrentTaskInUnite = () =>
       if (!branch) {
         return;
       }
-      // const terminal = vscode.window.activeTerminal;
-      // terminal?.sendText(taskId);
       const taskId = branch.replace(TaskIdReg, "");
 
       if (!+taskId) {

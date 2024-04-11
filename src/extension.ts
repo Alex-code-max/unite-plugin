@@ -11,9 +11,10 @@ export function activate(context: vscode.ExtensionContext) {
   // 注册命令
   context.subscriptions.push(
     openTheCurrentTaskInUnite(),
-    getUniteTaskName(),
+    getUniteTaskName(context),
     openLoginWebView(context)
   );
+
   const watchingGitHead =
     vscode.workspace.createFileSystemWatcher("**/.git/logs/HEAD");
   watchingGitHead.onDidChange(() => {
