@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { openTheCurrentTaskInUnite } from "./command/open-the-current-task-in-unite";
 import { getUniteTaskName } from "./command/get-unite-task-name";
 import { openLoginWebView } from "./command/open-login-web-view";
+import { handleLogined } from "./utils/common";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -21,6 +22,14 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand("extension.getUniteTaskName");
   });
   vscode.commands.executeCommand("extension.getUniteTaskName");
+  vscode.window.registerUriHandler({
+    handleUri(uri: vscode.Uri) {
+      if (uri.authority === "alexyu.unite-plugin") {
+        const token = uri.query.replace("__AUTHZ_SSO_TICKET__=", "");
+        handleLogined(context, token);
+      }
+    },
+  });
 }
 
 // This method is called when your extension is deactivated

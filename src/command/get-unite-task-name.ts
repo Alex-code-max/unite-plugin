@@ -8,16 +8,9 @@ import { TaskIdReg } from "../utils/consts";
 
 export const getUniteTaskName = (context: vscode.ExtensionContext) =>
   vscode.commands.registerCommand("extension.getUniteTaskName", async () => {
-    vscode.window.registerUriHandler({
-      handleUri(uri: vscode.Uri) {
-        if (uri.authority === "alexyu.unite-plugin") {
-          const token = uri.query.replace("__AUTHZ_SSO_TICKET__=", "");
-          handleLogined(context, token);
-        }
-      },
-    });
     const branch = await getGitBranch();
     if (!branch) {
+      vscode.window.showInformationMessage("没有分支");
       return;
     }
     const taskId = branch.replace(TaskIdReg, "");

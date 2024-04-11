@@ -4,10 +4,9 @@ import axios from "axios";
 const fs = require("fs");
 import * as os from "os";
 import { Platform } from "./enum";
-import { UnitProjectUrl } from "./consts";
 import { exec } from "child_process";
 
-export const getGitBranch = async () => {
+export const getGitBranch = () => {
   // 获取当前工作目录
   let projectRoot = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
   if (!projectRoot) {
@@ -55,7 +54,7 @@ export const handleGetTaskName = async (
   taskId: string,
   context: vscode.ExtensionContext
 ) => {
-  const token = GetStorageData(context);
+  const token = await GetStorageData(context);
   axios({
     method: "POST",
     url: "https://unite.qa.tcshuke.com/api/project/getIssueByField",
@@ -70,12 +69,15 @@ export const handleGetTaskName = async (
       issueId: taskId,
     },
   })
-    .then((response: any) => {
+    .then(async (response: any) => {
       if (response.data.statusCode === 401) {
         vscode.window.showInformationMessage("登录过期，请重新登录");
-        OpenBrowser(
-          "https://tccommon.17usoft.com/oauth/authorize?response_type=code&scope=read&client_id=JF_AUTHZ_CLIENT&redirect_uri=https://authzsso.tcshuke.com/oa/authorizationCallback&state=eac685ce9bcd4bce865b90fdde37dd2e&return_uri=https://alex-code-max.github.io/alexyu_blog/unite-login"
+        const callableUri = await vscode.env.asExternalUri(
+          vscode.Uri.parse(
+            "https://tccommon.17usoft.com/oauth/authorize?response_type=code&scope=read&client_id=JF_AUTHZ_CLIENT&redirect_uri=https://authzsso.tcshuke.com/oa/authorizationCallback&state=eac685ce9bcd4bce865b90fdde37dd2e&return_uri=https://alex-code-max.github.io/alexyu_blog/unite-login"
+          )
         );
+        vscode.env.openExternal(callableUri);
         return;
       }
       if (response.data.code !== "0000") {
