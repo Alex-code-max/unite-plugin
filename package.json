@@ -2,7 +2,7 @@
   "name": "unite-plugin",
   "displayName": "unite-plugin",
   "description": "天元项目插件",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/Alex-code-max/unite-plugin"
